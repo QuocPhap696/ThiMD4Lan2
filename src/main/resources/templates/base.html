@@ -71,14 +71,14 @@
                   <div class="form-group">
                     <label for="author">Author</label>
                     <span class="text-danger">*</span>
-                    <select name="author" id="author" class="form-control">
+                    <select name="author.id" id="author" class="form-control">
                       <!-- Lấy categories từ server gửi về và đổ vào đây bằng Js -->
                     </select>
                   </div>
 
-                  <select name="" id="typeCre" class="form-select">
+                  <select name="eType" id="typeCre" class="form-select">
                     <th:block th:each="enumValue : ${enumValues}">
-                      <option th:value="enumValue" th:text="${enumValue}"></option>
+                      <option th:value="${enumValue}" th:text="${enumValue}"></option>
                     </th:block>
                   </select>
 
@@ -90,13 +90,13 @@
 
                   <div class="form-group">
                     <label for="date">Publish Date</label><span class="text-danger">*</span>
-                    <input type="date" name="date" id="date" class="form-control">
+                    <input type="date" name="publishDate" id="date" class="form-control">
                   </div>
 
                   <div class="form-group">
                     <label for="category">Category</label>
                     <span class="text-danger">*</span>
-                    <select name="category" id="category" class="form-control">
+                    <select name="category.id" id="category" class="form-control">
                       <!-- Lấy categories từ server gửi về và đổ vào đây bằng Js -->
 
                     </select>
@@ -128,8 +128,9 @@
         </div>
         <div class="modal-body">
           <form action="" id="edit-product" >
-            <input type="hidden" name="action" id="id-action" value="create">
+            <input type="hidden" name="action" id="edit-id" value="create">
             <div class=" card-body">
+
               <div class="row">
                 <div class="col-md-12">
                   <div class="form-group">
@@ -295,9 +296,14 @@
           number: "Vui long nhập số",
           min: "Nhập giá trị lớn hơn 10"
         },
-
+        description: {
+          required: "Vui lòng nhập mô tả",
+        },
+        publishDate: {
+          required: "Vui lòng chọn ngày",
+        },
         category: {
-          required: "Vui lòng chọn id sản phẩm",
+          required: "Vui lòng chọn loại",
         }
       },
       errorElement: 'span',
@@ -377,32 +383,6 @@
     });
   })
 
-  // function showCreate(){
-  //   $.ajax({
-  //     url: "/api/category/findAll",
-  //     url: "/api/author/findAll",
-  //     type: 'GET',
-  //     success: function (data) {
-  //       let cate = `<option value="">Select a category</option>`;
-  //       let author = `<option value="">Select a category</option>`;
-  //       let type = `<option value="">Select a category</option>`;
-  //
-  //       data.forEach(cate,author,type => {
-  //         cate += `<option  value=${cate.id}>${cate.categoryName}</option>`;
-  //         author += `<option  value=${author.id}>${author.authorName}</option>`;
-  //         type += `<option  value=${type.id}>${type}</option>`;
-  //       })
-  //       $('#category').html(option);
-  //       $('#author').html(option);
-  //       $('#type').html(option);
-  //
-  //     },
-  //     errors: function (errors) {
-  //
-  //     }
-  //   });
-  //
-  // }
 
   function showCreate() {
     $.ajax({
@@ -450,14 +430,23 @@
         id: idBook
       },
       success: function (data) {
-        console.log(data.product)
-        $('#edit-id').val(data.product.id)
-        $('#edit-name').val(data.product.name)
-        $('#edit-price').val(data.product.price)
-        let option = ``;
-        data.categories.forEach(cate => {
-          if(cate.id === data.product.category.id) {
-            option += `<option  value=${cate.id} selected>${cate.categoryName}</option>`;
+        console.log(data.book)
+        $('#edit-id').val(data.book.id)
+        $('#edit-title').val(data.book.title)
+        $('#edit-price').val(data.book.price)
+        $('#edit-description').val(data.book.description)
+        $('#edit-date').val(data.book.publishDate)
+        $('#edit-category').val(data.book.category)
+        let title = ``;
+        let price = ``;
+        let author = ``;
+        let type = ``;
+        let description = ``;
+        let date = ``;
+        let category = ``;
+        data.categories.forEach(book => {
+          if(book.id === data.border.category.id) {
+            title += `<textarea  value=${book.id} selected>${book.title}</textarea>`;
           } else {
             option += `<option  value=${cate.id}>${cate.categoryName}</option>`;
           }
@@ -481,7 +470,7 @@
   }
 
   /*Gọi tới API products để lấy ra danh sách toàn bộ sản phẩm
-	(DS products mặc định chứ không có sort, find ở đây)  */
+	 */
   function  renderDatas() {
     $.ajax({
       url: "/api/books",
@@ -495,7 +484,7 @@
     })
   };
 
-  //định nghĩa lại hàm sau khi sort giá
+  //định nghĩa lại hàm
   function renderData(datas) {
     console.log(datas)
     let html = ``;
@@ -519,26 +508,25 @@
   }
 
   /*Function kết hợp giữa tìm kiếm và sắp xếp  */
-  // function FindNameAndSort() {
-  //   // let fromPrice = $("#fromPrice").val();
-  //   // let toPrice = $("#toPrice").val();
-  //   // $('#labelFromPrice').html("From Price: " + fromPrice)
-  //   // $('#labelToPrice').html("To Price: " + toPrice)
-  //   let price = $("#sort-price").val();
-  //   let name = $("#find-name").val();
-  //   console.log("price",price)
-  //   console.log("name",name)
-  //   $.ajax({
-  //     url: "/api/products/sortAndFind",
-  //     type: 'GET',
-  //     data: {
-  //       price: price,
-  //       name: name
-  //     },
-  //     success: function (datas) {
-  //       renderData(datas)
-  //     }
-  //   });
-  // }
+  function FindName() {
+    let title = $("#sort-price").val();
+    let description = $("#find-name").val();
+    let authorname = $("#find-name").val();
+    let categoryname = $("#find-name").val();
+    let type = $("#find-name").val();
+    console.log("price",title)
+    console.log("name",name)
+    $.ajax({
+      url: "/api/books/sort",
+      type: 'GET',
+      data: {
+        price: price,
+        name: name
+      },
+      success: function (datas) {
+        renderData(datas)
+      }
+    });
+  }
 </script>
 </html>

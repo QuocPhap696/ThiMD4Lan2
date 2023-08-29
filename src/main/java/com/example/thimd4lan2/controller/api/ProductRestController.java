@@ -64,4 +64,12 @@ public class ProductRestController {
         bookService.delete(id);
         return ResponseEntity.ok("xoa thanh cong");
     }
+
+//    @GetMapping("/sort")
+//    public ResponseEntity<?> sortAndFind(
+//            @RequestParam(defaultValue = "@") String price,
+//            @RequestParam(defaultValue = "")String name){
+//        List<Book> bookList = bookService.findProductsByNameContainingOrderByPriceAsc(name,price);
+//        return ResponseEntity.ok(productList);
+//    }
 }

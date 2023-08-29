@@ -1,5 +1,6 @@
 package com.example.thimd4lan2.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,6 +18,7 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String title;
+    @JsonFormat(pattern="yyyy-MM-dd")
     private LocalDate publishDate;
     private String description;
     private BigDecimal price;
