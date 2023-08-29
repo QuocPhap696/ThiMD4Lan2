@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="ISO-8859-1">
+  <title>List Book</title>
+
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.slim.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</head>
+<body>
+<div class="container my-2">
+  <h1>Product List</h1>
+  <button data-toggle="modal" data-target="#modal-create" data-togg onclick="showCreate()"
+          class="btn btn-primary btn-sm mb-3" >Add Product</button>
+
+  <input id="find-name" placeholder="Nhập tên cần tìm kiếm" oninput="FindNameAndSort()"/>
+  <table border="1" class="table table-striped table-responsive-md">
+    <thead>
+    <tr>
+      <th>#</th>
+      <th>Title</th>
+      <th>Description</th>
+      <th>PublishDate</th>
+      <th>Price</th>
+      <th>Author</th>
+      <th>Category</th>
+      <th>Type</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody id="tBodyProduct">
+
+    </tbody>
+  </table>
+  <!-- Modal create-->
+  <div class="modal fade" id="modal-create" data-backdrop="static">
+    <div class="modal-dialog modal-xs">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Add Product</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <form action="" id="create-product" >
+            <input type="hidden" name="action" id="action" value="create">
+            <div class=" card-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label for="title">Title</label><span class="text-danger">*</span>
+                    <input type="text" name="title" id="title" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label for="price">Price</label><span class="text-danger">*</span>
+                    <input type="text" name="price" id="price" class="form-control">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="author">Author</label>
+                    <span class="text-danger">*</span>
+                    <select name="author" id="author" class="form-control">
+                      <!-- Lấy categories từ server gửi về và đổ vào đây bằng Js -->
+                    </select>
+                  </div>
+
+                  <select name="" id="typeCre" class="form-select">
+                    <th:block th:each="enumValue : ${enumValues}">
+                      <option th:value="enumValue" th:text="${enumValue}"></option>
+                    </th:block>
+                  </select>
+
+
+                  <div class="form-group">
+                    <label for="description">Description</label><span class="text-danger">*</span>
+                    <input type="text" name="description" id="description" class="form-control">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="date">Publish Date</label><span class="text-danger">*</span>
+                    <input type="date" name="date" id="date" class="form-control">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="category">Category</label>
+                    <span class="text-danger">*</span>
+                    <select name="category" id="category" class="form-control">
+                      <!-- Lấy categories từ server gửi về và đổ vào đây bằng Js -->
+
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <button class=" form-submit btn btn-primary">Add</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+
+  <!-- Modal edit-->
+  <div class="modal fade" id="modal-edit" data-backdrop="static">
+    <div class="modal-dialog modal-xs">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Edit Book</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form action="" id="edit-product" >
+            <input type="hidden" name="action" id="id-action" value="create">
+            <div class=" card-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label for="title">Title</label><span class="text-danger">*</span>
+                    <input type="text" name="title" id="edit-title" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label for="price">Price</label><span class="text-danger">*</span>
+                    <input type="text" name="price" id="edit-price" class="form-control">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="author">Author</label>
+                    <span class="text-danger">*</span>
+                    <select name="author" id="edit-author" class="form-control">
+                      <!-- Lấy categories từ server gửi về và đổ vào đây bằng Js -->
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="author">Type</label>
+                    <span class="text-danger">*</span>
+                    <select name="type" id="type" class="form-control">
+                      <!-- Lấy categories từ server gửi về và đổ vào đây bằng Js -->
+                    </select>
+                  </div>
+
+
+                  <div class="form-group">
+                    <label for="description">Description</label><span class="text-danger">*</span>
+                    <input type="text" name="description" id="edit-description" class="form-control">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="date">Publish Date</label><span class="text-danger">*</span>
+                    <input type="date" name="date" id="edit-date" class="form-control">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="category">Category</label>
+                    <span class="text-danger">*</span>
+                    <select name="category" id="edit-category" class="form-control">
+                      <!-- Lấy categories từ server gửi về và đổ vào đây bằng Js -->
+
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <button class=" form-submit btn btn-primary">Update</button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+
+</div>
+
+</body>
+<script>
+
+  $(document).ready(function() {
+    renderDatas();
+    //submit edit và validate
+    $('#edit-product').validate({
+      rules: {
+        name: {
+          required: true,
+        },
+        price: {
+          required: true,
+          number: true,
+          min: 1000
+        },
+        category: {
+          required: true
+        }
+      },
+      messages: {
+        name: {
+          required: "Vui lòng nhập tên sản phẩm"
+        },
+        price: {
+          required: "Vui lòng nhập giá",
+          number: "Vui long nhập số",
+          min: "Nhập giá trị lớn hơn 1000"
+        },
+
+        category: {
+          required: "Vui lòng chọn loại sản phẩm",
+        }
+      },
+      errorElement: 'span',
+      errorPlacement: function (error, element) {
+        error.addClass('invalid-feedback');
+        element.closest('.form-group').append(error);
+      },
+      highlight: function (element, errorClass, validClass) {
+        $(element).addClass('is-invalid');
+      },
+      unhighlight: function (element, errorClass, validClass) {
+        $(element).removeClass('is-invalid');
+      },
+
+      submitHandler: function(form, e){
+        e.preventDefault();
+        var formData = new FormData(form);
+        console.log(...formData)
+        $.ajax({
+          type: "post",
+          url: "/api/products/edit",
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function (p) {
+            $('#modal-create').modal('hide');
+            $('#create-product')[0].reset();
+            renderDatas();
+          },
+          error: function (data, textStatus, errorThrown) {
+            console.log('Error:', errorThrown);
+          },
+        });
+      }
+    });
+
+    //submit create và validate
+    $('#create-product').validate({
+      rules: {
+        title: {
+          required: true,
+        },
+        price: {
+          required: true,
+          number: true,
+          min: 10
+        },
+        author: {
+          required: true
+        },
+        description: {
+          required: true
+        },
+        publishDate: {
+          required: true
+        },
+        category: {
+          required: true
+        }
+      },
+      messages: {
+        title: {
+          required: "Vui lòng nhập tên"
+        },
+        price: {
+          required: "Vui lòng nhập giá",
+          number: "Vui long nhập số",
+          min: "Nhập giá trị lớn hơn 10"
+        },
+
+        category: {
+          required: "Vui lòng chọn id sản phẩm",
+        }
+      },
+      errorElement: 'span',
+      errorPlacement: function (error, element) {
+        error.addClass('invalid-feedback');
+        element.closest('.form-group').append(error);
+      },
+      highlight: function (element, errorClass, validClass) {
+        $(element).addClass('is-invalid');
+      },
+      unhighlight: function (element, errorClass, validClass) {
+        $(element).removeClass('is-invalid');
+      },
+      submitHandler: function(form, e){
+        e.preventDefault();
+        var formData = new FormData(form);
+        console.log(...formData)
+        $.ajax({
+          type: "post",
+          url: "/api/books/create",
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function (p) {
+            $('#modal-create').modal('hide');
+            $('#create-product')[0].reset();
+            renderDatas();
+          },
+          error: function (data, textStatus, errorThrown) {
+            console.log('Error:', errorThrown);
+          },
+        });
+      }
+    });
+
+    //submit category và validate
+    $('#create-category').validate( {
+      rules: {
+        categoryName: {
+          required: true,
+        }
+      },
+      messages: {
+        categoryName: {
+          required: "Vui lòng nhập tên sản phẩm"
+        }
+      },
+      errorElement: 'span',
+      errorPlacement: function (error, element) {
+        error.addClass('invalid-feedback');
+        element.closest('.form-group').append(error);
+      },
+      highlight: function (element, errorClass, validClass) {
+        $(element).addClass('is-invalid');
+      },
+      unhighlight: function (element, errorClass, validClass) {
+        $(element).removeClass('is-invalid');
+      },
+      submitHandler: function(form, e){
+        e.preventDefault();
+        var formData = new FormData(form);
+        console.log(...formData)
+        $.ajax({
+          type: "post",
+          url: "/api/category/createCategory",
+          data: formData,
+          success: function (p) {
+            $('#modal-create-category').modal('hide');
+            $('#create-category')[0].reset();
+            renderDatas();
+          },
+          error: function (data, textStatus, errorThrown) {
+            console.log('Error:', errorThrown);
+          },
+        });
+      }
+    });
+  })
+
+  // function showCreate(){
+  //   $.ajax({
+  //     url: "/api/category/findAll",
+  //     url: "/api/author/findAll",
+  //     type: 'GET',
+  //     success: function (data) {
+  //       let cate = `<option value="">Select a category</option>`;
+  //       let author = `<option value="">Select a category</option>`;
+  //       let type = `<option value="">Select a category</option>`;
+  //
+  //       data.forEach(cate,author,type => {
+  //         cate += `<option  value=${cate.id}>${cate.categoryName}</option>`;
+  //         author += `<option  value=${author.id}>${author.authorName}</option>`;
+  //         type += `<option  value=${type.id}>${type}</option>`;
+  //       })
+  //       $('#category').html(option);
+  //       $('#author').html(option);
+  //       $('#type').html(option);
+  //
+  //     },
+  //     errors: function (errors) {
+  //
+  //     }
+  //   });
+  //
+  // }
+
+  function showCreate() {
+    $.ajax({
+      url: "/api/category/findAll",
+      type: 'GET',
+      success: function (data) {
+        let cateOptions = `<option value="">Select a category</option>`;
+
+        data.forEach(category => {
+          cateOptions += `<option value="${category.id}">${category.categoryName}</option>`;
+        });
+
+        $('#category').html(cateOptions);
+      },
+      error: function (error) {
+        console.error("Error fetching categories:", error);
+      }
+    });
+
+    $.ajax({
+      url: "/api/author/findAll",
+      type: 'GET',
+      success: function (data) {
+        let authorOptions = `<option value="">Select an author</option>`;
+
+        data.forEach(author => {
+          authorOptions += `<option value="${author.id}">${author.authorName}</option>`;
+        });
+
+        $('#author').html(authorOptions);
+      },
+      error: function (error) {
+        console.error("Error fetching authors:", error);
+      }
+    });
+
+
+  }
+
+  function showEdit(idProduct){
+    $.ajax({
+      url: "/api/books/edit",
+      type: 'GET',
+      data: {
+        id: idBook
+      },
+      success: function (data) {
+        console.log(data.product)
+        $('#edit-id').val(data.product.id)
+        $('#edit-name').val(data.product.name)
+        $('#edit-price').val(data.product.price)
+        let option = ``;
+        data.categories.forEach(cate => {
+          if(cate.id === data.product.category.id) {
+            option += `<option  value=${cate.id} selected>${cate.categoryName}</option>`;
+          } else {
+            option += `<option  value=${cate.id}>${cate.categoryName}</option>`;
+          }
+        })
+        $('#edit-category').html(option);
+      }
+    });
+  }
+
+  function Delete(id){
+    $.ajax({
+      url: "/api/books/delete",
+      type:'Get',
+      data:{
+        id : id
+      },
+      success: function (message){
+        renderDatas()
+      }
+    })
+  }
+
+  /*Gọi tới API products để lấy ra danh sách toàn bộ sản phẩm
+	(DS products mặc định chứ không có sort, find ở đây)  */
+  function  renderDatas() {
+    $.ajax({
+      url: "/api/books",
+      type: 'GET',
+      success: function (data) {
+        renderData(data)
+        console.log(data)
+      },
+      errors: function (errors) {
+      }
+    })
+  };
+
+  //định nghĩa lại hàm sau khi sort giá
+  function renderData(datas) {
+    console.log(datas)
+    let html = ``;
+    datas.forEach((b) => {
+      html += `
+        		<tr>
+					<td >${b.id}</td>
+					<td >${b.title}</td>
+					<td >${b.description}</td>
+					<td >${b.publishDate}</td>
+					<td >${b.price}</td>
+					<td >${b.author.authorName}</td>
+					<td >${b.category.categoryName}</td>
+					<td >${b.etype}</td>
+					<td><a data-toggle="modal" onclick=showEdit(${b.id}) data-target="#modal-edit" class="btn btn-primary">Update</a>
+						<a onclick=Delete(${b.id}) class="btn btn-danger">Delete</a></td>
+				</tr>
+        	`
+    })
+    $("#tBodyProduct").html(html)
+  }
+
+  /*Function kết hợp giữa tìm kiếm và sắp xếp  */
+  // function FindNameAndSort() {
+  //   // let fromPrice = $("#fromPrice").val();
+  //   // let toPrice = $("#toPrice").val();
+  //   // $('#labelFromPrice').html("From Price: " + fromPrice)
+  //   // $('#labelToPrice').html("To Price: " + toPrice)
+  //   let price = $("#sort-price").val();
+  //   let name = $("#find-name").val();
+  //   console.log("price",price)
+  //   console.log("name",name)
+  //   $.ajax({
+  //     url: "/api/products/sortAndFind",
+  //     type: 'GET',
+  //     data: {
+  //       price: price,
+  //       name: name
+  //     },
+  //     success: function (datas) {
+  //       renderData(datas)
+  //     }
+  //   });
+  // }
+</script>
+</html>
